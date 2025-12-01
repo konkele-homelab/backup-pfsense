@@ -5,7 +5,7 @@ set -eu
 # Environment defaults
 # ----------------------------
 BACKUP_DIR="${BACKUP_DIR:-/backup}"
-SERVERS_FILE="${SERVERS_FILE:-/config/pfsense_backup}"
+SERVERS_FILE="${SERVERS_FILE:-/config/servers}"
 SCRIPT_NAME="${SCRIPT_NAME:-pfsense-backup.sh}"
 KEEP_DAYS="${KEEP_DAYS:-30}"
 CURL_TIMEOUT="${CURL_TIMEOUT:-60}" # seconds

@@ -9,9 +9,10 @@ This repository contains a minimal Docker image to automate **pfSense configurat
 - Back up multiple pfSense instances from a single container.
 - Configurable backup directory and backup retention.
 - Swarm secret support for storing credentials.
-- Configurable UID/GID for the backup process.
+- Configurable backup directory and retention period
+- Automatic pruning of old backups
+- Runs as non-root user with configurable UID/GID
 - Lightweight Alpine base image.
-- Minimal production-ready shell scripts.
 
 ---
 
@@ -19,12 +20,12 @@ This repository contains a minimal Docker image to automate **pfSense configurat
 
 | Variable       | Default                       | Description |
 |----------------|-------------------------------|-------------|
+| SERVERS_FILE   | `/config/servers`      | Path to file or secret containing pfSense credentials (`FQDN:USERNAME:PASSWORD`) |
 | BACKUP_DIR     | `/backup`                     | Directory where backups are stored inside the container |
-| SERVERS_FILE   | `/config/pfsense_backup`      | Path to file or secret containing pfSense credentials (`FQDN:USERNAME:PASSWORD`) |
-| TZ             | `America/Chicago`             | Timezone for timestamps |
+| KEEP_DAYS      | `30`                          | Number of days to retain backups |
 | USER_UID       | `3000`                        | UID of backup user |
 | USER_GID       | `3000`                        | GID of backup user |
-| KEEP_DAYS      | `30`                          | Number of days to retain backups |
+| TZ             | `America/Chicago`             | Timezone for timestamps |
 
 ---
 
@@ -48,19 +49,19 @@ pfsense.example.com:backupuser:securepass123
 version: "3.9"
 
 services:
-  pfsense_backup:
-    image: registry.lab.konkel.us/pfsense-backup:latest
+  pfsense-backup:
+    image: your-dockerhub-username/pfsense-backup:latest
     volumes:
       - /backup:/backup
     environment:
       BACKUP_DIR: /backup
-      SERVERS_FILE: /run/secrets/pfsense_backup
+      SERVERS_FILE: /run/secrets/pfsense-backup
       TZ: America/Chicago
       USER_UID: 3000
       USER_GID: 3000
       KEEP_DAYS: 30
     secrets:
-      - pfsense_backup
+      - pfsense-backup
     deploy:
       mode: replicated
       replicas: 1
@@ -68,7 +69,7 @@ services:
         condition: none
 
 secrets:
-  pfsense_backup:
+  pfsense-backup:
     external: true
 ```
 
@@ -76,11 +77,11 @@ secrets:
 
 1. Create the Swarm secret:
 ```bash
-docker secret create pfsense_backup ./servers
+docker secret create pfsense-backup ./servers
 ```
 2. Deploy the stack:
 ```bash
-docker stack deploy -c docker-compose.yml pfsense_backup_stack
+docker stack deploy -c docker-compose.yml pfsense-backup_stack
 ```
 
 ---
@@ -90,10 +91,10 @@ docker stack deploy -c docker-compose.yml pfsense_backup_stack
 For testing without Swarm, you can mount the servers file and run the container directly:
 ```bash
 docker run -it --rm \
-  -v /mnt/archive/pfsense:/backup \
-  -v ./servers:/config/pfsense_backup \
+  -v /backup:/backup \
+  -v ./servers:/config/servers \
   -e SCRIPT_NAME=pfsense-backup.sh \
-  registry.lab.konkel.us/pfsense-backup:latest
+  your-dockerhub-username/pfsense-backup:latest
 ```
 
 ---
