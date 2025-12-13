@@ -8,12 +8,13 @@ This repository contains a minimal Docker image to automate **pfSense configurat
 
 - Back up multiple pfSense instances from a single container.
 - Creates a **single timestamped snapshot directory per run** containing all host backups.
-- Configurable backup directory and pluggable retention policies: **GFS, FIFO, Calendar**.
-- Swarm secret support for storing credentials and SMTP secrets.
-- Automatic pruning of old snapshots according to retention policy.
-- XML validation to ensure backups are valid before retention is applied.
+- Swarm secret support for storing credentials.
+- Pluggable backup retention policies: **GFS**, **FIFO**, **Calendar**.
+- Automatic creation of daily, weekly, and monthly snapshots (for GFS).
 - Runs as non-root user with configurable UID/GID.
 - Lightweight Alpine base image.
+- Email notifications on success and/or failure.
+- **DRY-RUN mode** for safe testing without modifying data.
 
 ---
 
@@ -171,10 +172,20 @@ Change `RETENTION_POLICY` to `fifo` or `calendar` to test other modes.
 
 ---
 
+## Logging
+
+- Logs each backup start, completion, and file paths.
+- Logs pruning actions according to the selected retention policy.
+- Errors are written to `stderr`.
+
+---
+
 ## Notes
 
 - Backup files are validated to ensure they contain a valid `<pfsense>` XML root before being accepted.
 - UID/GID customization ensures backup files match host filesystem ownership.
-- Retention logic is implemented in `backup_common.sh` and shared across backup images.
-- The container uses `su-exec` to drop privileges before running backups.
+- Pluggable retention policies allow flexible backup management:
+  - **GFS**: Daily/weekly/monthly snapshots with `latest` symlink.
+  - **FIFO**: Keeps only the last `FIFO_COUNT` snapshots.
+  - **Calendar**: Keeps all snapshots for a specified number of days.
 - Use `DRY_RUN=true` to safely test backup and retention behavior without modifying files.
