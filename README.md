@@ -64,7 +64,7 @@ Backups are organized into timestamped snapshot directories:
 | EMAIL_ON_SUCCESS    | `false`                                | Send email when backup succeeds |
 | EMAIL_ON_FAILURE    | `false`                                | Send email when backup fails |
 | EMAIL_TO            | `admin@example.com`                    | Recipient of status notifications |
-| EMAIL_FROM          | `backup@example.com`                  | Sender address for email notifications |
+| EMAIL_FROM          | `backup@example.com`                   | Sender address for email notifications |
 | SMTP_SERVER         | `smtp.example.com`                     | SMTP server hostname or IP |
 | SMTP_PORT           | `25`                                   | SMTP server port |
 | SMTP_TLS            | `off`                                  | Enable TLS (`off` / `on`) |
