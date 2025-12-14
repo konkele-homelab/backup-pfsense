@@ -138,6 +138,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           build-args: |
+            UPSTREAM_REGISTRY=${{ secrets.REGISTRY }}
             UPSTREAM_TAG=${{ env.UPSTREAM_TAG }}
           platforms: linux/amd64
           provenance: false

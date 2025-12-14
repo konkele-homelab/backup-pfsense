@@ -1,10 +1,5 @@
-# Default Arguments for Upstream Base Image
-ARG UPSTREAM_REGISTRY=registry.lab.konkel.us
-ARG UPSTREAM_REPO=backup-base
-ARG UPSTREAM_TAG=latest
-
 # Use Upstream Base Image
-FROM ${UPSTREAM_REGISTRY}/${UPSTREAM_REPO}:${UPSTREAM_TAG}
+FROM ${UPSTREAM_REGISTRY}/backup-base:${UPSTREAM_TAG}
 
 # App Specific Backup Script
 ARG SCRIPT_FILE=backup-pfsense.sh
